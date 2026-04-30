@@ -1,0 +1,6 @@
+flowchart LR
+  OM[OpenMeow] --> SDK[@openclaw/sdk]
+  SDK --> GW[OpenClaw Gateway RPC]
+  GW --> RT[OpenClaw runtime]
+  RT --> PS[Plugin SDK internals]
+  RT --> ACP[ACP/harness adapters]

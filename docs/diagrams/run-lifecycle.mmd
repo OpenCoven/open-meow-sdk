@@ -1,0 +1,13 @@
+sequenceDiagram
+  autonumber
+  participant OpenMeow
+  participant SDK as @openclaw/sdk
+  participant Gateway
+  participant Agent
+  OpenMeow->>SDK: session.send(prompt)
+  SDK->>Gateway: sessions.send / agent
+  Gateway->>Agent: enqueue run
+  Agent-->>Gateway: events
+  Gateway-->>SDK: raw events
+  SDK-->>OpenMeow: normalized events
+  OpenMeow->>SDK: run.wait() / cancel()
