@@ -54,6 +54,7 @@ It intentionally depends only on the public `@openclaw/sdk` package boundary:
 - `mapOpenClawEventToOpenMeowUIEvent()` converts normalized SDK events into compact OpenMeow UI events.
 - `initialOpenMeowUIState()` and `reduceOpenMeowUIState()` build app-facing lane state: assistant messages/drafts, compact tool activity, approval cards, terminal composer state, and debug-only raw events.
 - `reduceOpenMeowRunState()` and `markOpenMeowRunCancelling()` implement the send-or-stop composer state.
+- `reduceOpenMeowCancelResult()` maps the immediate cancel/abort response into deterministic UI recovery while the live Gateway wait/cancel contract is clarified.
 - `normalizeOpenMeowWaitResult()` separates a wait deadline (`status: "accepted"`) from a runtime timeout (`status: "timed_out"`).
 
 ## UI state guarantees OpenMeow wants

@@ -484,6 +484,48 @@ function upsertApproval(state, event, uiEvent) {
   return { ...state, approvals };
 }
 
+function cancelSucceededForRun(result, runId) {
+  if (!isObject(result) || result.ok === false) return false;
+  const status = typeof result.status === "string" ? result.status.toLowerCase() : undefined;
+  if (status === "aborted" || status === "cancelled" || status === "canceled") return true;
+  if (result.aborted === true) return true;
+  if (typeof result.abortedRunId === "string" && result.abortedRunId === runId) return true;
+  if (Array.isArray(result.runIds) && result.runIds.includes(runId) && result.aborted !== false) return true;
+  return false;
+}
+
+export function reduceOpenMeowCancelResult(state, run, result) {
+  const current = state ?? initialOpenMeowUIState();
+  const runId = assertNonEmptyString(run?.runId ?? current.composer.activeRun?.runId, "runId");
+  const sessionKey = assertNonEmptyString(
+    run?.sessionKey ?? current.composer.activeRun?.sessionKey,
+    "sessionKey",
+  );
+
+  if (cancelSucceededForRun(result, runId)) {
+    return {
+      ...current,
+      composer: reduceOpenMeowRunState(current.composer, {
+        type: "run.cancelled",
+        runId,
+        sessionKey,
+      }),
+    };
+  }
+
+  return {
+    ...current,
+    composer: {
+      mode: "streaming",
+      activeRun: { runId, sessionKey },
+      canSend: false,
+      canStop: true,
+      lastTerminalStatus: null,
+      waitDeadlineExpired: false,
+    },
+  };
+}
+
 export function reduceOpenMeowUIState(state, event) {
   let next = state ?? initialOpenMeowUIState();
   const uiEvent = mapOpenClawEventToOpenMeowUIEvent(event);

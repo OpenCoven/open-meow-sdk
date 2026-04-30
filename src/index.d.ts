@@ -125,3 +125,8 @@ export function markOpenMeowRunCancelling(state: OpenMeowRunState | undefined): 
 export function normalizeOpenMeowWaitResult(result: unknown): OpenMeowWaitResult;
 export function initialOpenMeowUIState(options?: { sessionKey?: string }): OpenMeowLaneUIState;
 export function reduceOpenMeowUIState(state: OpenMeowLaneUIState | undefined, event: unknown): OpenMeowLaneUIState;
+export function reduceOpenMeowCancelResult(
+  state: OpenMeowLaneUIState | undefined,
+  run: OpenMeowRunRef,
+  result: unknown,
+): OpenMeowLaneUIState;

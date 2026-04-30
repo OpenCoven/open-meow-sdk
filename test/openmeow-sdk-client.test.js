@@ -10,6 +10,7 @@ import {
   normalizeOpenMeowWaitResult,
   reduceOpenMeowRunState,
   reduceOpenMeowUIState,
+  reduceOpenMeowCancelResult,
 } from "../src/index.js";
 
 function readFixtureEvents(name) {
@@ -452,5 +453,58 @@ describe("OpenMeow fixture contract", () => {
         status: "resolved",
       },
     ]);
+  });
+});
+
+describe("OpenMeow live cancel response mapping", () => {
+  it("uses a successful sessions.abort response as deterministic cancelled UI state", () => {
+    const running = reduceOpenMeowUIState(initialOpenMeowUIState({ sessionKey: "session:cody" }), {
+      type: "run.started",
+      runId: "run_1",
+      sessionKey: "session:cody",
+    });
+    const cancelling = { ...running, composer: markOpenMeowRunCancelling(running.composer) };
+
+    assert.deepEqual(
+      reduceOpenMeowCancelResult(cancelling, { runId: "run_1", sessionKey: "session:cody" }, {
+        ok: true,
+        abortedRunId: "run_1",
+        status: "aborted",
+      }).composer,
+      {
+        mode: "idle",
+        activeRun: null,
+        canSend: true,
+        canStop: false,
+        lastTerminalStatus: "cancelled",
+        waitDeadlineExpired: false,
+      },
+    );
+  });
+
+  it("keeps the active run recoverable when cancel fails", () => {
+    const running = reduceOpenMeowUIState(initialOpenMeowUIState({ sessionKey: "session:cody" }), {
+      type: "run.started",
+      runId: "run_1",
+      sessionKey: "session:cody",
+    });
+    const cancelling = { ...running, composer: markOpenMeowRunCancelling(running.composer) };
+
+    assert.deepEqual(
+      reduceOpenMeowCancelResult(cancelling, { runId: "run_1", sessionKey: "session:cody" }, {
+        ok: false,
+        abortedRunId: "run_1",
+        status: "aborted",
+        error: "not active",
+      }).composer,
+      {
+        mode: "streaming",
+        activeRun: { runId: "run_1", sessionKey: "session:cody" },
+        canSend: false,
+        canStop: true,
+        lastTerminalStatus: null,
+        waitDeadlineExpired: false,
+      },
+    );
   });
 });

@@ -106,3 +106,10 @@ Current local coverage:
 - Fixture reducer tests prove known P0 event types render without raw/debug UI fallback.
 - Tool fixture events collapse into one stable activity row across start/delta/completed.
 - Approval fixture events create/update one stable approval card across requested/resolved.
+
+Live Gateway dogfood evidence:
+
+- See [`live-dogfood-2026-04-29.md`](live-dogfood-2026-04-29.md).
+- Happy path connected, listed agents, fetched Cody identity, created a lane session, sent a prompt, streamed assistant deltas, rendered final assistant text, and waited to `completed`.
+- Cancel path returned a successful `status: "aborted"` response; OpenMeow maps that response to a deterministic `cancelled` composer state.
+- Live gaps found: raw `chat` events currently leak into `run.events()`, and cancel response / stream terminal event / wait result disagree.
