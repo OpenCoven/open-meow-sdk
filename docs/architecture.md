@@ -19,7 +19,7 @@ flowchart LR
   end
 
   subgraph SDK[Public App SDK]
-    OCSDK[@openclaw/sdk]
+    OCSDK["@openclaw/sdk"]
     Client[OpenClaw client]
     Events[Normalized event stream]
     Namespaces[agents / sessions / runs / models / tools / approvals]
