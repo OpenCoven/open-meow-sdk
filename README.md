@@ -11,9 +11,15 @@ This repo is intentionally docs-first. Its job is to clarify the product boundar
 
 ## Start here
 
+- [`docs/peter-review-brief.md`](docs/peter-review-brief.md) — concise review packet to share with Peter.
 - [`docs/architecture.md`](docs/architecture.md) — system architecture and Mermaid diagrams.
 - [`docs/gateway-rpc-gap-map.md`](docs/gateway-rpc-gap-map.md) — SDK method vs Gateway RPC readiness.
+- [`docs/rpc-contract-proposals.md`](docs/rpc-contract-proposals.md) — proposed Gateway RPC contracts for SDK gaps.
 - [`docs/openmeow-dogfood-plan.md`](docs/openmeow-dogfood-plan.md) — parallel implementation plan for OpenMeow.
+- [`docs/openmeow-sdk-adapter-shape.md`](docs/openmeow-sdk-adapter-shape.md) — smallest adapter OpenMeow needs.
+- [`docs/prioritized-backlog.md`](docs/prioritized-backlog.md) — P0/P1/P2 work breakdown.
+- [`docs/adr/0001-use-openmeow-as-sdk-dogfood.md`](docs/adr/0001-use-openmeow-as-sdk-dogfood.md) — ADR for OpenMeow as SDK dogfood client.
+- [`examples/typescript-basic-run`](examples/typescript-basic-run) — target app-developer quickstart shape.
 
 ## Status
 
