@@ -1,0 +1,6 @@
+{"version":1,"id":"happy:1","ts":1777500000000,"type":"run.created","runId":"run_happy","sessionKey":"session:openmeow:happy","agentId":"cody","data":{"label":"OpenMeow SDK happy path"}}
+{"version":1,"id":"happy:2","ts":1777500000100,"type":"run.started","runId":"run_happy","sessionKey":"session:openmeow:happy","agentId":"cody","data":{"status":"running"}}
+{"version":1,"id":"happy:3","ts":1777500000200,"type":"assistant.delta","runId":"run_happy","sessionKey":"session:openmeow:happy","agentId":"cody","data":{"text":"OpenMeow "}}
+{"version":1,"id":"happy:4","ts":1777500000300,"type":"assistant.delta","runId":"run_happy","sessionKey":"session:openmeow:happy","agentId":"cody","data":{"text":"SDK dogfood is connected."}}
+{"version":1,"id":"happy:5","ts":1777500000400,"type":"assistant.message","runId":"run_happy","sessionKey":"session:openmeow:happy","agentId":"cody","data":{"text":"OpenMeow SDK dogfood is connected."}}
+{"version":1,"id":"happy:6","ts":1777500000500,"type":"run.completed","runId":"run_happy","sessionKey":"session:openmeow:happy","agentId":"cody","data":{"status":"completed"}}

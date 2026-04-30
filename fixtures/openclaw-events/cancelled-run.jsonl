@@ -1,0 +1,4 @@
+{"version":1,"id":"cancel:1","ts":1777500200000,"type":"run.created","runId":"run_cancelled","sessionKey":"session:openmeow:cancelled","agentId":"cody","data":{"label":"Cancel fixture"}}
+{"version":1,"id":"cancel:2","ts":1777500200100,"type":"run.started","runId":"run_cancelled","sessionKey":"session:openmeow:cancelled","agentId":"cody","data":{"status":"running"}}
+{"version":1,"id":"cancel:3","ts":1777500200200,"type":"assistant.delta","runId":"run_cancelled","sessionKey":"session:openmeow:cancelled","agentId":"cody","data":{"text":"Starting a longer task..."}}
+{"version":1,"id":"cancel:4","ts":1777500200300,"type":"run.cancelled","runId":"run_cancelled","sessionKey":"session:openmeow:cancelled","agentId":"cody","data":{"status":"cancelled","reason":"user"}}

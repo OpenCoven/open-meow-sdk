@@ -1,0 +1,4 @@
+{"version":1,"id":"timeout:1","ts":1777500300000,"type":"run.created","runId":"run_timeout","sessionKey":"session:openmeow:timeout","agentId":"cody","data":{"label":"Timeout fixture"}}
+{"version":1,"id":"timeout:2","ts":1777500300100,"type":"run.started","runId":"run_timeout","sessionKey":"session:openmeow:timeout","agentId":"cody","data":{"status":"running"}}
+{"version":1,"id":"timeout:3","ts":1777500300200,"type":"tool.call.started","runId":"run_timeout","sessionKey":"session:openmeow:timeout","agentId":"cody","data":{"toolName":"exec","summary":"Long-running command"}}
+{"version":1,"id":"timeout:4","ts":1777500300300,"type":"run.timed_out","runId":"run_timeout","sessionKey":"session:openmeow:timeout","agentId":"cody","data":{"status":"timed_out","reason":"runtime_timeout"}}

@@ -1,0 +1,9 @@
+{"version":1,"id":"approval:1","ts":1777500100000,"type":"run.created","runId":"run_approval","sessionKey":"session:openmeow:approval","agentId":"cody","data":{"label":"Approval card fixture"}}
+{"version":1,"id":"approval:2","ts":1777500100100,"type":"run.started","runId":"run_approval","sessionKey":"session:openmeow:approval","agentId":"cody","data":{"status":"running"}}
+{"version":1,"id":"approval:3","ts":1777500100200,"type":"tool.call.started","runId":"run_approval","sessionKey":"session:openmeow:approval","agentId":"cody","data":{"toolName":"exec","summary":"Run test command"}}
+{"version":1,"id":"approval:4","ts":1777500100300,"type":"approval.requested","runId":"run_approval","sessionKey":"session:openmeow:approval","agentId":"cody","data":{"approvalId":"approval_exec_tests","kind":"tool","toolName":"exec","summary":"Run pnpm test","risk":"medium","decisions":["approve_once","deny"]}}
+{"version":1,"id":"approval:5","ts":1777500100400,"type":"approval.resolved","runId":"run_approval","sessionKey":"session:openmeow:approval","agentId":"cody","data":{"approvalId":"approval_exec_tests","decision":"approve_once"}}
+{"version":1,"id":"approval:6","ts":1777500100500,"type":"tool.call.delta","runId":"run_approval","sessionKey":"session:openmeow:approval","agentId":"cody","data":{"toolName":"exec","text":"tests running..."}}
+{"version":1,"id":"approval:7","ts":1777500100600,"type":"tool.call.completed","runId":"run_approval","sessionKey":"session:openmeow:approval","agentId":"cody","data":{"toolName":"exec","status":"completed"}}
+{"version":1,"id":"approval:8","ts":1777500100700,"type":"assistant.message","runId":"run_approval","sessionKey":"session:openmeow:approval","agentId":"cody","data":{"text":"Tests passed after approval."}}
+{"version":1,"id":"approval:9","ts":1777500100800,"type":"run.completed","runId":"run_approval","sessionKey":"session:openmeow:approval","agentId":"cody","data":{"status":"completed"}}
