@@ -99,3 +99,10 @@ Validation command:
 ```bash
 node scripts/validate-event-fixtures.mjs
 ```
+
+Current local coverage:
+
+- `npm test` validates fixture shape and runs the OpenMeow adapter/UI reducer tests.
+- Fixture reducer tests prove known P0 event types render without raw/debug UI fallback.
+- Tool fixture events collapse into one stable activity row across start/delta/completed.
+- Approval fixture events create/update one stable approval card across requested/resolved.

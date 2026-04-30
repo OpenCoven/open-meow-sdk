@@ -23,4 +23,10 @@ This repo is intentionally docs-first. Its job is to clarify the product boundar
 
 ## Status
 
-Draft architecture for review with Peter/OpenClaw maintainers. No OpenClaw core changes live here.
+This repo now includes the first local P0 dogfood adapter implementation:
+
+- `src/index.js` — OpenMeow-side adapter over `@openclaw/sdk` plus UI event/lane-state/run-state helpers.
+- `src/index.d.ts` — app-facing TypeScript types.
+- `test/openmeow-sdk-client.test.js` — Node test coverage for agents/sessions/runs, normalized UI events, wait deadlines, and stop-button state.
+
+No OpenClaw core changes live here.

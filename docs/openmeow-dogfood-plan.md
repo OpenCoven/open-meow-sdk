@@ -45,6 +45,8 @@ Map normalized SDK events into OpenMeow UI state:
 | `run.timed_out` | Mark timeout with retry affordance. |
 | `run.failed` | Show recoverable error state. |
 
+Local implementation note: `reduceOpenMeowUIState()` now demonstrates this mapping in code by accumulating assistant drafts/final messages, compact tool activity, approval cards, terminal composer state, and debug-only raw events.
+
 ## Phase 3 — stop/cancel semantics
 
 OpenMeow composer should show **send or stop, never both**.

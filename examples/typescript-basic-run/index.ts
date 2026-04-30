@@ -1,35 +1,79 @@
-import { OpenClaw } from "@openclaw/sdk";
+import {
+  createOpenMeowSDKClient,
+  initialOpenMeowUIState,
+  mapOpenClawEventToOpenMeowUIEvent,
+  normalizeOpenMeowWaitResult,
+  reduceOpenMeowUIState,
+} from "../../src/index.js";
 
-const oc = new OpenClaw({
+const client = createOpenMeowSDKClient({
   gateway: process.env.OPENCLAW_GATEWAY_URL ?? "auto",
   token: process.env.OPENCLAW_GATEWAY_TOKEN,
   password: process.env.OPENCLAW_GATEWAY_PASSWORD,
 });
 
+let uiState = initialOpenMeowUIState();
+
 try {
-  const agent = await oc.agents.get(process.env.OPENCLAW_AGENT_ID ?? "main");
-  const run = await agent.run({
-    input: process.argv.slice(2).join(" ") || "Say hello from the OpenClaw SDK.",
-    label: "sdk-basic-run-example",
+  await client.connect();
+
+  const agentId = process.env.OPENCLAW_AGENT_ID ?? "main";
+  const session = await client.createLaneSession({
+    agentId,
+    label: "openmeow-sdk-basic-run-example",
   });
 
-  for await (const event of run.events()) {
-    if (event.type === "assistant.delta") {
-      process.stdout.write(String(event.data));
+  uiState = { ...uiState, sessionKey: session.sessionKey };
+
+  const run = await client.send(
+    session.sessionKey,
+    process.argv.slice(2).join(" ") || "Say hello from the OpenMeow SDK adapter.",
+  );
+
+  uiState = reduceOpenMeowUIState(uiState, {
+    type: "run.started",
+    runId: run.runId,
+    sessionKey: run.sessionKey,
+  });
+
+  for await (const event of client.events(run.runId)) {
+    uiState = reduceOpenMeowUIState(uiState, event);
+    const uiEvent = mapOpenClawEventToOpenMeowUIEvent(event);
+
+    if (uiEvent.kind === "assistant_delta") {
+      process.stdout.write(uiEvent.text);
     }
 
-    if (
-      event.type === "run.completed" ||
-      event.type === "run.failed" ||
-      event.type === "run.cancelled" ||
-      event.type === "run.timed_out"
-    ) {
+    if (uiEvent.kind === "approval_card" && uiEvent.phase === "requested") {
+      console.log(`\napproval requested: ${uiEvent.title}`);
+    }
+
+    if (uiEvent.kind === "tool_activity" && uiEvent.phase === "started") {
+      console.log(`\ntool: ${uiEvent.title}`);
+    }
+
+    if (uiEvent.kind === "run_terminal") {
       break;
     }
   }
 
-  const result = await run.wait({ timeoutMs: 30_000 });
-  console.log("\nstatus:", result.status);
+  const wait = normalizeOpenMeowWaitResult(await client.wait(run.runId, 30_000));
+  console.log("\nwait:", wait.status, "terminal:", wait.terminal);
+  console.log(
+    "composer:",
+    uiState.composer.mode,
+    "canSend:",
+    uiState.composer.canSend,
+    "canStop:",
+    uiState.composer.canStop,
+  );
+  console.log(
+    "ui:",
+    `${uiState.messages.length} messages,`,
+    `${uiState.toolActivities.length} tools,`,
+    `${uiState.approvals.length} approvals,`,
+    `${uiState.debugEvents.length} debug events`,
+  );
 } finally {
-  await oc.close();
+  await client.close();
 }

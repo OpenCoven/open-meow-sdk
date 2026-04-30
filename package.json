@@ -1,0 +1,24 @@
+{
+  "name": "@opencoven/open-meow-sdk",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "OpenMeow dogfood adapter for the OpenClaw app SDK.",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "scripts": {
+    "test": "node scripts/validate-event-fixtures.mjs && node --test"
+  },
+  "peerDependencies": {
+    "@openclaw/sdk": ">=0.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@openclaw/sdk": {
+      "optional": true
+    }
+  }
+}
