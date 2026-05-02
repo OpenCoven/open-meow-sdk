@@ -125,3 +125,11 @@ For HTTP `/tools/invoke`, `OPENCLAW_GATEWAY_PASSWORD` bearer auth succeeded whil
 2. Keep #4 open: HTTP `/tools/invoke` works, but SDK-facing JSON-RPC `tools.invoke` is not available in the live installed Gateway.
 3. Prioritize auth drift cleanup before wiring OpenMeow's `GatewayDesktopUseClient` into product UI, because its current token-first bearer selection may choose a credential that works for WebSocket but fails for HTTP `/tools/invoke`.
 4. Keep #5/#6/#7 as design/proposal issues; the live Gateway does not expose artifact/task/environment RPCs yet.
+
+
+## Follow-up probes — 2026-05-02
+
+- `oc.tools.list()` against the live Gateway now returns a populated tool catalog (core groups plus the `opencoven-desktop-use` plugin tool).
+- `oc.request("tools.invoke", { name: "desktop_use", args: { action: "doctor" } })` still fails with `unknown method: tools.invoke`.
+- `xcodebuild -project OpenMeow.xcodeproj -scheme OpenMeow -configuration Debug -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build` succeeds, which means the app is buildable locally even though the signed build path still needs attention.
+- `desktop_use inspect --app OpenMeow` is still blocked by missing Screen Recording permission on this machine.
