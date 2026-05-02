@@ -133,3 +133,39 @@ For HTTP `/tools/invoke`, `OPENCLAW_GATEWAY_PASSWORD` bearer auth succeeded whil
 - `oc.request("tools.invoke", { name: "desktop_use", args: { action: "doctor" } })` still fails with `unknown method: tools.invoke`.
 - `xcodebuild -project OpenMeow.xcodeproj -scheme OpenMeow -configuration Debug -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build` succeeds, which means the app is buildable locally even though the signed build path still needs attention.
 - `desktop_use inspect --app OpenMeow` is still blocked by missing Screen Recording permission on this machine.
+
+## Desktop-use / Gateway fix pass — 2026-05-02 afternoon
+
+### Completed patches
+
+- `OpenCoven/desktop-use` commit `609cc00 fix: remove desktop plugin runtime dependency` removed the runtime `typebox` dependency from the plugin entry path by replacing schema construction with an inline JSON schema and TypeScript type.
+- `OpenCoven/desktop-use` commit `240c6a0 test: guard desktop plugin runtime imports` added a CI guard that scans plugin runtime files and fails if they import external runtime packages other than `node:*`, relative files, or `openclaw/*` host APIs. This is intended to catch the exact missing-dependency class that broke local plugin reload.
+- Local OpenClaw branch `fix/desktop-tool-gateway-invoke` commit `378e2a8376 fix: allow requested gateway plugin tool invokes` patches Gateway tool resolution so a directly requested non-core/plugin tool is temporarily added to profile allowlists and plugin materialization allowlists for that invocation. Explicit later denies still apply.
+
+### Verification
+
+Desktop-use repo:
+
+```text
+pnpm run check
+```
+
+passed with:
+
+- `tsc --noEmit`
+- plugin runtime import guard
+- Rust unit tests: 5 passed
+
+OpenClaw branch:
+
+```text
+node scripts/run-vitest.mjs run --config test/vitest/vitest.gateway.config.ts src/gateway/tools-invoke-http.test.ts
+node scripts/run-tsgo.mjs -p tsconfig.test.src.json --incremental --tsBuildInfoFile .artifacts/tsgo-cache/test-src-desktop-tool-gateway-invoke.tsbuildinfo
+pnpm exec oxfmt --check src/gateway/tool-resolution.ts src/gateway/tools-invoke-shared.ts src/gateway/tools-invoke-http.test.ts
+```
+
+passed with `src/gateway/tools-invoke-http.test.ts` reporting 30 tests passed.
+
+### Remaining runtime caveat
+
+The OpenClaw fix is currently on a local branch/worktree, not merged into the running installed Gateway. Live Gateway behavior will still depend on either applying that patch to the installed runtime or getting the branch reviewed/merged/released. The protected `openclaw/openclaw` main merge rule still applies.
