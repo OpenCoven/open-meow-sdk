@@ -20,16 +20,18 @@ This maps the current SDK shape to Gateway methods so we can help Peter by valid
 | `oc.approvals.list()` | Pending exec approvals | `exec.approval.list` | Works today | Exec only today. |
 | `oc.approvals.respond()` | Resolve approval | `exec.approval.resolve` | Works today | May need unified exec/plugin approval facade. |
 | plugin approvals | Tool/plugin approval flow | `plugin.approval.*` | Gateway exists | SDK facade should normalize with exec approvals. |
-| `oc.tools.invoke()` | Generic app tool invocation | Proposed `tools.invoke` RPC | Missing | There is HTTP `/tools/invoke`, but SDK wants a clean Gateway RPC. |
+| `oc.tools.invoke()` | Generic app tool invocation | `tools.invoke` | Implemented upstream | Implemented by OpenClaw PR #74804 / issue #74705. OpenMeow adapter exposes it as `invokeTool()` and falls back to HTTP `/tools/invoke` for older installed Gateways that still report `unknown method`. |
 | `oc.tasks.list/get/cancel()` | Detached task ledger | Proposed `tasks.*` RPC | Missing/scaffolded | Background tasks exist conceptually, but SDK API throws unsupported. |
 | `oc.artifacts.list/get/download()` | Files/media/diffs/logs | Proposed `artifacts.*` RPC | Missing/scaffolded | Critical for rich OpenMeow results later. |
 | `oc.environments.*` | Local/node/managed execution envs | Proposed `environments.*` RPC | Missing/scaffolded | Good design target; should stay explicit unsupported for now. |
 
 ## Suggested next Gateway RPCs
 
-### `tools.invoke`
+### `tools.invoke` — implemented upstream
 
 A Gateway RPC equivalent of HTTP `/tools/invoke`, with the same policy and approval semantics.
+
+Status: implemented upstream by OpenClaw PR #74804 for issue #74705 and exposed through `oc.tools.invoke()`. OpenMeow keeps a temporary HTTP fallback because live installed Gateways may lag current OpenClaw main and return `unknown method: tools.invoke`.
 
 ```ts
 type ToolsInvokeParams = {

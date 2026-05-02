@@ -38,9 +38,11 @@ Acceptance:
 
 ## P1 — Gateway RPC gaps
 
-### 4. Add SDK-style `tools.invoke` RPC
+### 4. Add SDK-style `tools.invoke` RPC — done upstream
 
 **Why:** HTTP `/tools/invoke` exists, but SDK needs a Gateway RPC method with the same policy semantics.
+
+Status: implemented upstream by OpenClaw PR #74804 for issue #74705; this repo's adapter exposes it as `invokeTool()` with a temporary HTTP fallback for older installed Gateways.
 
 Acceptance:
 

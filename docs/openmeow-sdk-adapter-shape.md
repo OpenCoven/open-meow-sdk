@@ -27,6 +27,13 @@ interface OpenMeowSDKClient {
   wait(runId: string, timeoutMs?: number): Promise<unknown>;
   cancel(runId: string, sessionKey: string): Promise<unknown>;
   effectiveTools(sessionKey?: string): Promise<unknown>;
+  invokeTool(name: string, params?: {
+    args?: Record<string, unknown>;
+    sessionKey?: string;
+    agentId?: string;
+    confirm?: boolean;
+    idempotencyKey?: string;
+  }): Promise<unknown>;
 }
 ```
 
@@ -43,6 +50,7 @@ interface OpenMeowSDKClient {
 | `wait` | `oc.runs.wait(runId, { timeoutMs })` |
 | `cancel` | `oc.runs.cancel(runId, sessionKey)` |
 | `effectiveTools` | `oc.tools.effective({ sessionKey })` |
+| `invokeTool` | `oc.tools.invoke(name, params)` |
 
 ## Local implementation
 
@@ -56,6 +64,7 @@ It intentionally depends only on the public `@openclaw/sdk` package boundary:
 - `reduceOpenMeowRunState()` and `markOpenMeowRunCancelling()` implement the send-or-stop composer state.
 - `reduceOpenMeowCancelResult()` maps the immediate cancel/abort response into deterministic UI recovery while the live Gateway wait/cancel contract is clarified.
 - `normalizeOpenMeowWaitResult()` separates a wait deadline (`status: "accepted"`) from a runtime timeout (`status: "timed_out"`).
+- `invokeTool()` wraps the SDK-facing Gateway `tools.invoke` RPC added upstream in OpenClaw PR #74804, with a temporary HTTP `/tools/invoke` fallback for installed Gateways that still return `unknown method: tools.invoke`.
 
 ## UI state guarantees OpenMeow wants
 

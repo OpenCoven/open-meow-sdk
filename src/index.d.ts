@@ -15,6 +15,14 @@ export type OpenMeowRunRef = {
   sessionKey: string;
 };
 
+export type OpenMeowToolInvokeParams = {
+  args?: Record<string, unknown>;
+  sessionKey?: string;
+  agentId?: string;
+  confirm?: boolean;
+  idempotencyKey?: string;
+};
+
 export type OpenMeowRunState = {
   mode: "idle" | "streaming" | "cancelling";
   activeRun: OpenMeowRunRef | null;
@@ -108,6 +116,7 @@ export type OpenMeowSDKClient = {
   wait(runId: string, timeoutMs?: number): Promise<unknown>;
   cancel(runId: string, sessionKey: string): Promise<unknown>;
   effectiveTools(sessionKey?: string): Promise<unknown>;
+  invokeTool(name: string, params?: OpenMeowToolInvokeParams): Promise<unknown>;
 };
 
 export type OpenMeowSDKClientOptions = {

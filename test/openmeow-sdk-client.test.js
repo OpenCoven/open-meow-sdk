@@ -89,6 +89,10 @@ function makeFakeOpenClaw() {
         calls.push(["tools.effective", params]);
         return { tools: [], params };
       },
+      async invoke(name, params) {
+        calls.push(["tools.invoke", name, params]);
+        return { ok: true, toolName: name, output: { invoked: true } };
+      },
     },
   };
 }
@@ -124,6 +128,15 @@ describe("OpenMeow SDK adapter", () => {
       tools: [],
       params: { sessionKey: "session:cody" },
     });
+    assert.deepEqual(
+      await client.invokeTool("demo", {
+        args: { mode: "test" },
+        sessionKey: sent.sessionKey,
+        confirm: false,
+        idempotencyKey: "openmeow-tool-test",
+      }),
+      { ok: true, toolName: "demo", output: { invoked: true } },
+    );
     await client.close();
 
     assert.deepEqual(openClaw.calls, [
@@ -137,8 +150,104 @@ describe("OpenMeow SDK adapter", () => {
       ["runs.wait", "run_1", { timeoutMs: 30_000 }],
       ["runs.cancel", "run_1", "session:cody"],
       ["tools.effective", { sessionKey: "session:cody" }],
+      [
+        "tools.invoke",
+        "demo",
+        {
+          args: { mode: "test" },
+          sessionKey: "session:cody",
+          confirm: false,
+          idempotencyKey: "openmeow-tool-test",
+        },
+      ],
       ["close"],
     ]);
+  });
+
+  it("fails clearly when direct tool invocation is unavailable and no HTTP fallback is configured", async () => {
+    const client = createOpenMeowSDKClient({ openClaw: { tools: {} } });
+
+    await assert.rejects(
+      client.invokeTool("demo", { args: {} }),
+      /HTTP tool fallback requires an explicit Gateway URL/,
+    );
+  });
+
+  it("falls back to HTTP /tools/invoke when the live Gateway does not advertise tools.invoke yet", async () => {
+    const previousFetch = globalThis.fetch;
+    const requests = [];
+    globalThis.fetch = async (url, init) => {
+      requests.push({
+        url: String(url),
+        method: init.method,
+        authorization: init.headers.Authorization,
+        body: JSON.parse(init.body),
+      });
+      return {
+        ok: true,
+        status: 200,
+        async json() {
+          return { ok: true, result: { desktop: "ok" } };
+        },
+      };
+    };
+
+    try {
+      const client = createOpenMeowSDKClient({
+        gateway: "ws://127.0.0.1:18789",
+        token: "token-secret",
+        password: "password-secret",
+        openClaw: {
+          tools: {
+            async invoke() {
+              throw new Error("unknown method: tools.invoke");
+            },
+          },
+        },
+      });
+
+      assert.deepEqual(
+        await client.invokeTool("desktop_use", {
+          args: { action: "doctor" },
+          sessionKey: "agent:cody:main",
+          idempotencyKey: "desktop-doctor",
+        }),
+        { ok: true, toolName: "desktop_use", output: { desktop: "ok" }, source: "http" },
+      );
+      assert.deepEqual(requests, [
+        {
+          url: "http://127.0.0.1:18789/tools/invoke",
+          method: "POST",
+          authorization: "Bearer password-secret",
+          body: {
+            tool: "desktop_use",
+            args: { action: "doctor" },
+            sessionKey: "agent:cody:main",
+            idempotencyKey: "desktop-doctor",
+          },
+        },
+      ]);
+    } finally {
+      globalThis.fetch = previousFetch;
+    }
+  });
+
+  it("does not use HTTP fallback for confirm:true tool approvals", async () => {
+    const client = createOpenMeowSDKClient({
+      gateway: "ws://127.0.0.1:18789",
+      openClaw: {
+        tools: {
+          async invoke() {
+            throw new Error("unknown method: tools.invoke");
+          },
+        },
+      },
+    });
+
+    await assert.rejects(
+      client.invokeTool("desktop_use", { confirm: true }),
+      /HTTP tool fallback does not support confirm: true/,
+    );
   });
 
   it("supports current SDK handle objects that expose async agents.get(), Session.key, and Run.id", async () => {
