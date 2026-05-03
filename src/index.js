@@ -147,6 +147,78 @@ async function loadOpenClawFromSdk(options) {
   });
 }
 
+function isMissingToolsInvokeRpc(error) {
+  const message = error instanceof Error ? error.message : String(error ?? "");
+  return (
+    message.includes("unknown method: tools.invoke") ||
+    message.includes("OpenClaw SDK client does not expose tools.invoke()") ||
+    message.includes("oc.tools.invoke is not supported")
+  );
+}
+
+function resolveGatewayHttpUrl(options) {
+  const rawGateway = options.gateway ?? process.env.OPENCLAW_GATEWAY_URL;
+  if (typeof rawGateway !== "string" || !rawGateway.trim() || rawGateway === "auto") {
+    throw new Error("OpenMeow HTTP tool fallback requires an explicit Gateway URL");
+  }
+  const url = new URL(rawGateway);
+  if (url.protocol === "ws:") {
+    url.protocol = "http:";
+  } else if (url.protocol === "wss:") {
+    url.protocol = "https:";
+  }
+  url.pathname = "/tools/invoke";
+  url.search = "";
+  url.hash = "";
+  return url;
+}
+
+function resolveHttpBearer(options) {
+  return (
+    options.password ??
+    process.env.OPENCLAW_GATEWAY_PASSWORD ??
+    options.token ??
+    process.env.OPENCLAW_GATEWAY_TOKEN
+  );
+}
+
+async function invokeToolOverHttp(options, name, params) {
+  if (params.confirm === true) {
+    throw new Error("OpenMeow HTTP tool fallback does not support confirm: true approvals");
+  }
+  const url = resolveGatewayHttpUrl(options);
+  const headers = { "Content-Type": "application/json" };
+  const bearer = resolveHttpBearer(options);
+  if (typeof bearer === "string" && bearer.trim()) {
+    headers.Authorization = `Bearer ${bearer}`;
+  }
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      tool: name,
+      args: params.args,
+      sessionKey: params.sessionKey,
+      agentId: params.agentId,
+      idempotencyKey: params.idempotencyKey,
+    }),
+  });
+  const body = await response.json().catch(() => ({}));
+  if (response.ok && body?.ok === true) {
+    return { ok: true, toolName: name, output: body.result, source: "http" };
+  }
+  return {
+    ok: false,
+    toolName: name,
+    source: "http",
+    error: {
+      code: body?.error?.type ?? `http_${response.status}`,
+      message: body?.error?.message ?? response.statusText ?? "tool invocation failed",
+    },
+  };
+}
+
 export function createOpenMeowSDKClient(options = {}) {
   let openClaw = options.openClaw;
 
@@ -267,6 +339,25 @@ export function createOpenMeowSDKClient(options = {}) {
       }
       const params = typeof sessionKey === "string" && sessionKey.trim() ? { sessionKey } : {};
       return oc.tools.effective(params);
+    },
+
+    async invokeTool(name, params = {}) {
+      const toolName = assertNonEmptyString(name, "name");
+      if (!isObject(params)) {
+        throw new TypeError("params must be an object");
+      }
+      const oc = await getOpenClaw();
+      if (!oc.tools || typeof oc.tools.invoke !== "function") {
+        return await invokeToolOverHttp(options, toolName, params);
+      }
+      try {
+        return await oc.tools.invoke(toolName, params);
+      } catch (error) {
+        if (!isMissingToolsInvokeRpc(error)) {
+          throw error;
+        }
+        return await invokeToolOverHttp(options, toolName, params);
+      }
     },
   };
 }
