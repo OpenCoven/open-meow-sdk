@@ -1,5 +1,4 @@
 import { readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
 
 const dir = new URL("../fixtures/openclaw-events/", import.meta.url);
 const allowedTerminal = new Set(["run.completed", "run.failed", "run.cancelled", "run.timed_out"]);
@@ -7,8 +6,7 @@ const required = ["version", "id", "ts", "type", "data"];
 let checked = 0;
 
 for (const file of readdirSync(dir).filter((name) => name.endsWith(".jsonl")).sort()) {
-  const path = join(dir.pathname, file);
-  const lines = readFileSync(path, "utf8").split(/\r?\n/).filter(Boolean);
+  const lines = readFileSync(new URL(file, dir), "utf8").split(/\r?\n/).filter(Boolean);
   if (lines.length === 0) throw new Error(`${file}: empty fixture`);
   let terminalCount = 0;
   const ids = new Set();
