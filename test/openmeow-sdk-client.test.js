@@ -250,6 +250,38 @@ describe("OpenMeow SDK adapter", () => {
     );
   });
 
+  it("exposes OpenClaw environment discovery through the adapter", async () => {
+    const gatewayEnvironment = {
+      id: "gateway",
+      type: "gateway",
+      label: "Local Gateway",
+      status: "available",
+      capabilities: ["runs", "tools"],
+    };
+    const calls = [];
+    const client = createOpenMeowSDKClient({
+      openClaw: {
+        environments: {
+          async list(params) {
+            calls.push(["environments.list", params]);
+            return { environments: [gatewayEnvironment] };
+          },
+          async status(environmentId) {
+            calls.push(["environments.status", environmentId]);
+            return gatewayEnvironment;
+          },
+        },
+      },
+    });
+
+    assert.deepEqual(await client.listEnvironments(), { environments: [gatewayEnvironment] });
+    assert.deepEqual(await client.getEnvironmentStatus("gateway"), gatewayEnvironment);
+    assert.deepEqual(calls, [
+      ["environments.list", {}],
+      ["environments.status", "gateway"],
+    ]);
+  });
+
   it("supports current SDK handle objects that expose async agents.get(), Session.key, and Run.id", async () => {
     const calls = [];
     const client = createOpenMeowSDKClient({

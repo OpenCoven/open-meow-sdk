@@ -23,6 +23,18 @@ export type OpenMeowToolInvokeParams = {
   idempotencyKey?: string;
 };
 
+export type OpenMeowEnvironmentSummary = {
+  id: string;
+  type: "local" | "gateway" | "node" | "managed" | "ephemeral" | (string & {});
+  label?: string;
+  status: "available" | "unavailable" | "starting" | "stopping" | "error";
+  capabilities?: string[];
+};
+
+export type OpenMeowEnvironmentsListResult = {
+  environments: OpenMeowEnvironmentSummary[];
+};
+
 export type OpenMeowRunState = {
   mode: "idle" | "streaming" | "cancelling";
   activeRun: OpenMeowRunRef | null;
@@ -116,6 +128,8 @@ export type OpenMeowSDKClient = {
   wait(runId: string, timeoutMs?: number): Promise<unknown>;
   cancel(runId: string, sessionKey: string): Promise<unknown>;
   effectiveTools(sessionKey?: string): Promise<unknown>;
+  listEnvironments(params?: Record<string, unknown>): Promise<OpenMeowEnvironmentsListResult>;
+  getEnvironmentStatus(environmentId: string): Promise<OpenMeowEnvironmentSummary>;
   invokeTool(name: string, params?: OpenMeowToolInvokeParams): Promise<unknown>;
 };
 

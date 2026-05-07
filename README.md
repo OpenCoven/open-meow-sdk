@@ -27,6 +27,6 @@ This repo now includes the first local P0 dogfood adapter implementation:
 
 - `src/index.js` — OpenMeow-side adapter over `@openclaw/sdk` plus UI event/lane-state/run-state helpers.
 - `src/index.d.ts` — app-facing TypeScript types.
-- `test/openmeow-sdk-client.test.js` — Node test coverage for agents/sessions/runs, normalized UI events, wait deadlines, and stop-button state.
+- `test/openmeow-sdk-client.test.js` — Node test coverage for agents/sessions/runs, tools, read-only environment discovery, normalized UI events, wait deadlines, and stop-button state.
 
 No OpenClaw core changes live here.

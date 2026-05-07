@@ -15,7 +15,8 @@ OpenMeow is a good first dogfood client because it stresses the exact product su
 - normalized UI events
 - approvals
 - effective tool visibility
-- future artifacts/tasks/environments
+- read-only environment discovery
+- future artifacts/tasks
 
 ## What is already good
 
@@ -36,7 +37,7 @@ OpenMeow is a good first dogfood client because it stresses the exact product su
 
 4. **Unsupported future options currently fail loudly**
 
-   Runtime/environment/workspace selections are future-facing. Throwing explicit unsupported errors is better than silently dropping those fields.
+   Runtime/workspace selections and environment provisioning are future-facing. Throwing explicit unsupported errors is better than silently dropping those fields.
 
 ## Main concern
 
@@ -58,12 +59,12 @@ The current working core is real:
 - `exec.approval.*`
 - `plugin.approval.*`
 
-But future namespaces are scaffolded ahead of Gateway RPCs:
+Some future namespaces are still scaffolded ahead of Gateway RPCs:
 
 - `tasks.*`
 - `artifacts.*`
-- `environments.*`
-- SDK-style `tools.invoke`
+
+`tools.invoke` and read-only `environments.list/status` are now implemented upstream, so OpenMeow can validate those through the public SDK instead of treating them as design-only surfaces.
 
 That is fine if clearly marked as planned/unsupported, but it should not feel shipped yet.
 
@@ -86,10 +87,9 @@ This is the OpenMeow path:
 
 Add clean RPC methods for SDK-facing future nouns:
 
-- `tools.invoke`
 - `tasks.list/get/cancel`
 - `artifacts.list/get/download`
-- `environments.list/status` first; create/delete later.
+- environment create/delete later, after read-only `environments.list/status` has proven useful.
 
 ### P2 — Validate with OpenMeow
 

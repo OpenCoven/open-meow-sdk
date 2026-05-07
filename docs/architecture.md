@@ -197,7 +197,7 @@ flowchart LR
   Ephemeral --> Gateway
 ```
 
-Current SDK should reject unsupported runtime/environment/workspace fields explicitly rather than silently ignoring them. That behavior is good and should remain until Gateway support is real.
+Current SDK can discover environments read-only through `environments.list/status`, but run-level runtime/environment/workspace selection and provisioning should still reject unsupported fields explicitly rather than silently ignoring them.
 
 ## 6. OpenMeow module cut
 
