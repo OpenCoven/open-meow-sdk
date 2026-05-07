@@ -23,7 +23,7 @@ This maps the current SDK shape to Gateway methods so we can help Peter by valid
 | `oc.tools.invoke()` | Generic app tool invocation | `tools.invoke` | Implemented upstream | Implemented by OpenClaw PR #74804 / issue #74705. OpenMeow adapter exposes it as `invokeTool()` and falls back to HTTP `/tools/invoke` for older installed Gateways that still report `unknown method`. |
 | `oc.tasks.list/get/cancel()` | Detached task ledger | Proposed `tasks.*` RPC | Missing/scaffolded | Background tasks exist conceptually, but SDK API throws unsupported. |
 | `oc.artifacts.list/get/download()` | Files/media/diffs/logs | Proposed `artifacts.*` RPC | Missing/scaffolded | Critical for rich OpenMeow results later. |
-| `oc.environments.*` | Local/node/managed execution envs | Proposed `environments.*` RPC | Missing/scaffolded | Good design target; should stay explicit unsupported for now. |
+| `oc.environments.list/status()` | Local/node/managed execution envs | `environments.list/status` | Implemented upstream | Implemented by OpenClaw PR #74867 / issue #74708. OpenMeow adapter exposes read-only discovery as `listEnvironments()` and `getEnvironmentStatus()`. |
 
 ## Suggested next Gateway RPCs
 
@@ -64,13 +64,13 @@ artifacts.get({ artifactId })
 artifacts.download({ artifactId })
 ```
 
-### `environments.*`
+### `environments.*` — implemented upstream
 
-Start read-only/discovery first:
+Read-only environment discovery is implemented upstream by OpenClaw PR #74867 for issue #74708 and exposed by this adapter.
 
 ```ts
 environments.list()
 environments.status({ environmentId })
 ```
 
-Create/delete can follow once managed/node execution semantics are clearer.
+Create/delete and run-level environment provisioning should still wait until managed/node execution semantics are clearer.

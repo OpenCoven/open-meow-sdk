@@ -341,6 +341,26 @@ export function createOpenMeowSDKClient(options = {}) {
       return oc.tools.effective(params);
     },
 
+    async listEnvironments(params = {}) {
+      if (!isObject(params)) {
+        throw new TypeError("params must be an object");
+      }
+      const oc = await getOpenClaw();
+      if (!oc.environments || typeof oc.environments.list !== "function") {
+        throw new Error("OpenClaw SDK client does not expose environments.list()");
+      }
+      return oc.environments.list(params);
+    },
+
+    async getEnvironmentStatus(environmentId) {
+      const id = assertNonEmptyString(environmentId, "environmentId");
+      const oc = await getOpenClaw();
+      if (!oc.environments || typeof oc.environments.status !== "function") {
+        throw new Error("OpenClaw SDK client does not expose environments.status(environmentId)");
+      }
+      return oc.environments.status(id);
+    },
+
     async invokeTool(name, params = {}) {
       const toolName = assertNonEmptyString(name, "name");
       if (!isObject(params)) {

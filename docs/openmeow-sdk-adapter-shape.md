@@ -16,6 +16,14 @@ type OpenMeowSendResult = {
   sessionKey: string;
 };
 
+type OpenMeowEnvironmentSummary = {
+  id: string;
+  type: "local" | "gateway" | "node" | "managed" | "ephemeral" | string;
+  label?: string;
+  status: "available" | "unavailable" | "starting" | "stopping" | "error";
+  capabilities?: string[];
+};
+
 interface OpenMeowSDKClient {
   connect(): Promise<void>;
   close(): Promise<void>;
@@ -27,6 +35,8 @@ interface OpenMeowSDKClient {
   wait(runId: string, timeoutMs?: number): Promise<unknown>;
   cancel(runId: string, sessionKey: string): Promise<unknown>;
   effectiveTools(sessionKey?: string): Promise<unknown>;
+  listEnvironments(params?: Record<string, unknown>): Promise<{ environments: OpenMeowEnvironmentSummary[] }>;
+  getEnvironmentStatus(environmentId: string): Promise<OpenMeowEnvironmentSummary>;
   invokeTool(name: string, params?: {
     args?: Record<string, unknown>;
     sessionKey?: string;
@@ -50,6 +60,8 @@ interface OpenMeowSDKClient {
 | `wait` | `oc.runs.wait(runId, { timeoutMs })` |
 | `cancel` | `oc.runs.cancel(runId, sessionKey)` |
 | `effectiveTools` | `oc.tools.effective({ sessionKey })` |
+| `listEnvironments` | `oc.environments.list(params)` |
+| `getEnvironmentStatus` | `oc.environments.status(environmentId)` |
 | `invokeTool` | `oc.tools.invoke(name, params)` |
 
 ## Local implementation
@@ -65,6 +77,7 @@ It intentionally depends only on the public `@openclaw/sdk` package boundary:
 - `reduceOpenMeowCancelResult()` maps the immediate cancel/abort response into deterministic UI recovery while the live Gateway wait/cancel contract is clarified.
 - `normalizeOpenMeowWaitResult()` separates a wait deadline (`status: "accepted"`) from a runtime timeout (`status: "timed_out"`).
 - `invokeTool()` wraps the SDK-facing Gateway `tools.invoke` RPC added upstream in OpenClaw PR #74804, with a temporary HTTP `/tools/invoke` fallback for installed Gateways that still return `unknown method: tools.invoke`.
+- `listEnvironments()` and `getEnvironmentStatus()` wrap the read-only SDK-facing Gateway environment discovery RPCs added upstream in OpenClaw PR #74867.
 
 ## UI state guarantees OpenMeow wants
 

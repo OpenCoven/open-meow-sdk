@@ -71,11 +71,11 @@ Start with:
 - `tasks.get`
 - `tasks.cancel`
 
-### 7. Add environment discovery RPCs
+### 7. Add environment discovery RPCs — done upstream
 
 **Why:** managed/node/local environments should be visible before they are creatable.
 
-Start with:
+Status: implemented upstream by OpenClaw PR #74867 for issue #74708; this repo's adapter exposes read-only discovery as `listEnvironments()` and `getEnvironmentStatus()`.
 
 - `environments.list`
 - `environments.status`
